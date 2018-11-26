@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <!-- Stylesheet - uses path defined by flask -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}" />
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <title>{{disaster[5]}}</title>
+  </head>
+  <body>
+    <div class="container">
+      <!-- START NAV -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link" href="/disasters">Disasters <span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link" href="#">Other Stuff</a>
+            <a class="nav-item nav-link" href="#">More Stuff</a>
+          </div>
+        </div>
+      </nav>
+      <!-- END NAV -->
+      <div class="card">
+        <nav class="card-header navbar navbar-light bg-light justify-content-between">
+          <h5 id="disasterName" class="navbar-brand">{{disaster[5]}} ({{"Active" if disaster[8]==1 else "Closed"}})</h5>
+          <button id="deactivateButton" type="button" class="btn btn-primary"  {{"hidden=true" if disaster[8]==0 else ""}}>Deactivate</button>
+        </nav>
+        <div class="card-body">
+          <p class="card-text"><small class="text-muted">Description: </small></p>
+          <p class="card-text">{{disaster[6]}}</p>
+          <p class="card-text"><small class="text-muted">Details: </small></p>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Disaster ID: {{"{:05d}".format(disaster[0])}}</li>
+            <li class="list-group-item">Location: {{disaster[1]}}</li>
+            <li class="list-group-item">Starting Date: {{disaster[7]}}</li>
+            <li class="list-group-item">Disaster Radius: {{disaster[4]}} miles</li>
+          </ul>
+          <p class="card-text"><small class="text-muted">Map:</small></p>
+          <div id="map" style="height:300px;"></div>
+          <p class="card-text"><small class="text-muted">lat:{{disaster[2]}} long:{{disaster[3]}}</small></p>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      $(function() {
+        $('#deactivateButton').bind('click', function(){
+          $.getJSON('/disaster_{{disaster[0]}}_deactivate', function(data){
+            console.log(data);
+            if(data.message=="Success"){
+              $('#deactivateButton').text("Success");
+              $('#deactivateButton').prop("disabled", true);
+              $('#disasterName').text("{{disaster[5]}} (Closed)");
+            }else{
+              $('#deactivateButton').text("Failed");
+            }
+          });
+          return false;
+        });
+      });
+      function initMap(){
+        console.log("initting")
+        var loc = {lat:{{disaster[2]}}, lng: {{disaster[3]}} };
+        var map = new google.maps.Map(document.getElementById('map'), {zoom: 7, center: loc});
+        var marker = new google.maps.Marker({position: loc, map: map});
+        var disasterZone = new google.maps.Circle({
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          map: map,
+          center: loc,
+          radius: {{disaster[4]}} * 1609.34
+        });
+      }
+
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYRXoAwoh3lCVjeDF2PApFtGuOKSkIO60&callback=initMap">
+</script>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+.card{
+  margin-top: 10px;
+}
+
+.shadowed{
+  -webkit-box-shadow: 0 0 8px 1px rgba(0,0,0,0.5);
+  -moz-box-shadow: 0 0 8px 1px rgba(0,0,0,0.5);
+  box-shadow: 0 0 8px 1px rgba(0,0,0,0.5);
+}
