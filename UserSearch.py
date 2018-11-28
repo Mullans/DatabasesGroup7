@@ -21,7 +21,7 @@ def user_search():
 def search():
     
     cursor.execute("SELECT * FROM User")
-    return (cursor.fetchall())
+    return cursor.fetchall()
     
 if __name__ == '__main__':
     app.run(debug=True)    
