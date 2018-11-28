@@ -1,0 +1,23 @@
+<!#DOCTYPE html>
+<html>
+<head>
+    <style> table, th, td {
+    border: 1px solid black;
+}</style>
+    <title> Disaster Search</title>
+</head>
+<body>
+    <h1> User Search </h1>
+    <table>
+                {% for post in posts %}
+            <tr>
+              <th>{{post}}</th>
+              <!-- <td>{{Name}}</td>
+              <td>{{Location}}</td>
+              <td>{{Date}}</td>
+              <td>{{'True' if Active else 'False'}}</td> -->
+            </tr>
+            {% endfor %}
+    </table>
+</body>
+</html>

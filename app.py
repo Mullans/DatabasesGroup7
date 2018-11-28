@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, abort
 from Connection import Connection, check_location
 import json
 from datetime import datetime
+import mysql.connector as mysql
+
 app = Flask(__name__)
 
 
@@ -68,8 +70,39 @@ def result():
         return json.dumps(response)
 
 
+"""JJ's Section START"""
+dbConfig = {
+            "user": "root",
+            "password":"password",
+            "host":"127.0.0.1",
+            "database": "databases7"
+            }
+conn = mysql.connect(**dbConfig)
+
+cursor = conn.cursor()
+
+
+@app.route("/DisasterSearch")
+def disaster_search_page():
+    return render_template('DisasterSearch.html', posts = disaster_search())
+
+
+def disaster_search():
+    cursor.execute("SELECT * FROM Disasters")
+    return cursor.fetchall()
+
+
+@app.route("/UserSearch")
+def user_search_page():
+    return render_template('UserSearch.html',post = user_search())
+
+
+def user_search():
+    cursor.execute("SELECT * FROM User")
+    return cursor.fetchall()
+
+"""JJ's Section END"""
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
-
-# export FLASK_ENV=development

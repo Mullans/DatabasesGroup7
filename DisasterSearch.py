@@ -7,7 +7,8 @@ app = Flask(__name__)
 dbConfig = {
             "user": "root",
             "password":"password",
-            "host":"127.0.0.1"
+            "host":"127.0.0.1",
+            "database": "databases7"
             }
 conn = mysql.connect(**dbConfig)
 #print(conn)
@@ -18,8 +19,9 @@ def disaster_search():
     return render_template('DisasterSearch.html' , post = search())
 
 def search():
-    cursor.execute("SELECT * FROM Disaster")
+
+    cursor.execute("SELECT * FROM Disasters")
     return cursor.fetchall()
-    
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
