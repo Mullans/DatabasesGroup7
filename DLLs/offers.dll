@@ -1,0 +1,14 @@
+CREATE TABLE `Offers` (
+  `OfferID` int(11) NOT NULL,
+  `UserID` varchar(20) NOT NULL,
+  `GoodsID` int(11) NOT NULL,
+  `QuantityOffered` int(11) NOT NULL,
+  `QuantityClaimed` int(11) DEFAULT NULL,
+  `DatePosted` datetime NOT NULL,
+  `Duration` int(11) DEFAULT NULL,
+  PRIMARY KEY (`OfferID`),
+  KEY `fk_GoodsID_idx` (`GoodsID`),
+  KEY `fk_UsersID_idx` (`UserID`),
+  CONSTRAINT `fk_OfferGoodsID` FOREIGN KEY (`GoodsID`) REFERENCES `possiblegoods` (`goodsid`),
+  CONSTRAINT `fk_OfferUsersID` FOREIGN KEY (`UserID`) REFERENCES `users` (`userid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8

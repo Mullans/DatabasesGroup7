@@ -1,0 +1,14 @@
+CREATE TABLE `Users` (
+  `UserID` varchar(20) NOT NULL,
+  `IsVolunteer` int(11) NOT NULL,
+  `IsAdmin` int(11) NOT NULL,
+  `password` varchar(20) NOT NULL,
+  `Address` varchar(45) NOT NULL,
+  `Latitude` decimal(7,4) NOT NULL,
+  `Longitude` decimal(7,4) NOT NULL,
+  `FirstName` varchar(45) NOT NULL,
+  `LastName` varchar(45) NOT NULL,
+  `PhoneNumber` int(11) NOT NULL,
+  `UserRating` decimal(3,0) DEFAULT NULL,
+  PRIMARY KEY (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
