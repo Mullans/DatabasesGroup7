@@ -10,5 +10,7 @@ CREATE TABLE `Users` (
   `LastName` varchar(45) NOT NULL,
   `PhoneNumber` int(11) NOT NULL,
   `UserRating` decimal(3,0) DEFAULT NULL,
+  `email` varchar(45) NOT NULL,
+  `status` int(11) NOT NULL,
   PRIMARY KEY (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
