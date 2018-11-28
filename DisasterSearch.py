@@ -11,18 +11,15 @@ dbConfig = {
             }
 conn = mysql.connect(**dbConfig)
 #print(conn)
-cursor1 = conn.cursor()
-cursor1.execute("USE database3")
+cursor = conn.cursor()
 
 @app.route("/DisasterSearch")
-def user_search():
-    return render_template('DIsasterSearch.html' , post = search.posts)
+def disaster_search():
+    return render_template('DisasterSearch.html' , post = search())
 
 def search():
-    cursor = conn.cursor()
-    posts =[ cursor.execute("SELECT * FROM Disaster")]
-    return (cursor.fetchall())
+    cursor.execute("SELECT * FROM Disaster")
+    return cursor.fetchall()
     
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
