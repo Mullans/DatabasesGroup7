@@ -16,12 +16,12 @@ cursor.execute("USE database7")
 
 @app.route("/UserSearch")
 def user_search():
-    return render_template('UserSearch.html',post = search.post)
+    return render_template('UserSearch.html',post = search())
 
 def search():
     
-    post =[ cursor.execute("SELECT * FROM User")]
-    return (cursor.fetch())
+    cursor.execute("SELECT * FROM User")
+    return (cursor.fetchall())
     
 if __name__ == '__main__':
     app.run(debug=True)    
