@@ -33,7 +33,7 @@ class Connection:
         self.cursor.execute(*args, **kwargs)
 
     def executemany(self, operation, param_sequence):
-        """Like execute, but repeats the operation with different parameters"""
+        '''Like execute, but repeats the operation with different parameters'''
         self.cursor.executemany(operation, param_sequence)
 
     def fetch(self, count=None):
@@ -41,6 +41,16 @@ class Connection:
             return self.cursor.fetchall()
         else:
             return self.cursor.fetchmany(size=count)
+
+    def exec_proc(self, procedure, *params):
+        '''Use to execute a stored procedure with no results'''
+        self.cursor.callproc(procedure, *params)
+
+    def single_proc(self, procedure, *params):
+        '''Use to get the result of stored procedures with a single result'''
+        self.cursor.callproc(procedure, *params)
+        result = next(self.cursor.stored_results())
+        return result.fetchall()
 
     def commit(self, *args, **kwargs):
         self.conn.commit(*args, **kwargs)
@@ -69,38 +79,26 @@ class Connection:
         self.commit()
 
     def next_disaster_id(self):
-        op = "SELECT DisasterID FROM Disasters ORDER BY DisasterID DESC LIMIT 1"
-        self.execute(op)
-        prevID = self.fetch()
+        prevID = self.single_proc('next_disaster_id')
         if len(prevID) == 0:
             nextID = 1
         else:
             nextID = prevID[0][0] + 1
-        print(prevID)
-        print(nextID)
         return nextID
 
     def end_disaster(self, disaster_ID, commit=True):
-        op = "UPDATE Disasters SET Active = 0 WHERE DisasterID = %s"
-        data = (disaster_ID,)
-        self.execute(op, data)
-        self.commit()
+        self.exec_proc('end_disaster', [disaster_ID])
+        if commit:
+            self.commit()
 
-    def select_disasters(self, conditions=None, activeOnly=False, orderBy=None, shortForm=False):
-        query = "SELECT DisasterID, Name, DisasterLocation, StartDate, Active FROM Disasters" if shortForm else "SELECT * FROM Disasters"
-        if activeOnly:
-            if conditions is None:
-                conditions = []
-            conditions.append('Active = 1')
-        if conditions is not None:
-            if type(conditions) == list:
-                conditions = ['(' + item + ')' for item in conditions]
-                conditions = " AND ".join(conditions)
-            query += " WHERE " + conditions
-        if orderBy is not None:
-            query += " ORDER BY " + orderBy
-        self.execute(query)
-        return self.fetch()
+    def select_disaster(self, disaster_id):
+        return self.single_proc('select_disaster', [disaster_id])
+
+    def short_disasters(self, onlyActive=False):
+        return self.single_proc('short_disasters', [1 if onlyActive else 0])
+
+    def select_goods(self):
+        return self.single_proc('select_goods')
 
 
 def check_location(location):
@@ -108,6 +106,10 @@ def check_location(location):
     loc = geolocator.geocode(location)
     return loc
 
+
 if __name__ == '__main__':
     # print(check_location("Iowa City").json)
-    datetime
+    with Connection() as conn:
+        print(conn.select_disaster(2))
+        conn.end_disaster(2)
+        print(conn.select_disaster(2))

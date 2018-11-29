@@ -44,8 +44,7 @@ def deactivate_disaster(disasterID):
 
 
 @app.route('/createDisaster', methods=['POST', 'GET'])
-def result():
-    print("Creating")
+def create_disaster():
     if request.method == 'POST':
         result = request.form
         valid_location = check_location(result['DisasterLocation']) is not None
@@ -68,6 +67,24 @@ def result():
             "created": success
         }
         return json.dumps(response)
+    else:
+        abort(404)
+
+
+@app.route('/createRequest')
+def create_request_page():
+    with Connection() as conn:
+        disasters = conn.short_disasters(activeOnly=True)
+    return render_template("makeRequest.html", disasters=disasters)
+
+
+@app.route('/createRequest_new', methods=['POST', 'GET'])
+def create_request():
+    if request.method == 'POST':
+        result = request.form
+        return result
+    else:
+        abort(404)
 
 
 """JJ's Section START"""
