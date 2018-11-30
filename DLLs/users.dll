@@ -8,7 +8,7 @@ CREATE TABLE `Users` (
   `Longitude` decimal(7,4) NOT NULL,
   `FirstName` varchar(45) NOT NULL,
   `LastName` varchar(45) NOT NULL,
-  `PhoneNumber` int(11) NOT NULL,
+  `PhoneNumber` varchar(15) NOT NULL,
   `UserRating` decimal(3,0) DEFAULT NULL,
   `email` varchar(45) NOT NULL,
   `status` int(11) NOT NULL,

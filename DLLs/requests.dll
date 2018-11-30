@@ -1,5 +1,5 @@
 CREATE TABLE `Requests` (
-  `RequestID` int(11) NOT NULL,
+  `RequestID` int(11) NOT NULL AUTO_INCREMENT,
   `UserID` varchar(20) NOT NULL,
   `DisasterID` int(11) NOT NULL,
   `GoodsID` int(11) NOT NULL,

@@ -1,5 +1,5 @@
 CREATE TABLE `Disasters` (
-  `DisasterID` int(11) NOT NULL,
+  `DisasterID` int(11) NOT NULL AUTO_INCREMENT,
   `DisasterLocation` varchar(200) NOT NULL,
   `Latitude` decimal(7,4) NOT NULL,
   `Longitude` decimal(7,4) NOT NULL,
