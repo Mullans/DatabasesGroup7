@@ -21,6 +21,9 @@ class Connection:
         self.conn = mysql.connect(**_config)
         self.cursor = self.conn.cursor()
         self.geolocator = None
+        self.user = 'Stan'
+        self.isVolunteer = True
+        self.isAdmin = True
 
     def __enter__(self):
         return self
@@ -65,26 +68,23 @@ class Connection:
         self.execute("SHOW TABLES")
         return self.fetch()
 
+    def check_location(location):
+        geolocator = Nominatim(user_agent="DatabaseProject7")
+        loc = geolocator.geocode(location)
+        return loc
+
+    # Disasters Methods
     def insert_disaster(self, location, radius, name, description, date=datetime.now().date(), commit=True):
-        disaster_ID = self.next_disaster_id()
         if self.geolocator is None:
             self.geolocator = Nominatim(user_agent="DatabaseProject7")
         loc = self.geolocator.geocode(location)
         if loc is None:
             return False
         lat, long = loc.latitude, loc.longitude
-        op = ("INSERT INTO Disasters (DisasterID, DisasterLocation, Latitude, Longitude, Radius, Name, Description, StartDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
-        data = (disaster_ID, location, lat, long, radius, name, description, date)
+        op = ("INSERT INTO Disasters (DisasterLocation, Latitude, Longitude, Radius, Name, Description, StartDate) VALUES (%s, %s, %s, %s, %s, %s, %s)")
+        data = (location, lat, long, radius, name, description, date)
         self.execute(op, data)
         self.commit()
-
-    def next_disaster_id(self):
-        prevID = self.single_proc('next_disaster_id')
-        if len(prevID) == 0:
-            nextID = 1
-        else:
-            nextID = prevID[0][0] + 1
-        return nextID
 
     def end_disaster(self, disaster_ID, commit=True):
         self.exec_proc('end_disaster', [disaster_ID])
@@ -94,22 +94,35 @@ class Connection:
     def select_disaster(self, disaster_id):
         return self.single_proc('select_disaster', [disaster_id])
 
-    def short_disasters(self, onlyActive=False):
-        return self.single_proc('short_disasters', [1 if onlyActive else 0])
+    def short_disasters(self, activeOnly=False):
+        return self.single_proc('short_disasters', [1 if activeOnly else 0])
 
+    # Goods Methods
     def select_goods(self):
         return self.single_proc('select_goods')
 
+    def search_goods(self, searchTerm):
+        return self.single_proc('search_goods', [searchTerm + '%'])
 
-def check_location(location):
-    geolocator = Nominatim(user_agent="DatabaseProject7")
-    loc = geolocator.geocode(location)
-    return loc
+    def select_goods_categories(self):
+        return self.single_proc('goods_categories')
+
+    def insert_good(self, name, category, unitOfMeasure):
+        op = ("INSERT INTO PossibleGoods (Category, Name, UnitOfMeasure) VALUES (%s %s %s)")
+        data = (category, name, unitOfMeasure)
+        self.execute(op, data)
+        self.commit()
+
+    # Requests Methods
+    def insert_request(self, user, disaster, good, duration, quantity):
+        date = datetime.new().date()
+        op = ("INSERT INTO Requests (UserID, DisasterID, GoodsID, DatePosted, Duration, QuantityNeeded, QuantityReceived) VALUES (%s %s %s %s %s %s %s)")
+        data = (user, disaster, good, date, duration, quantity, 0)
+        self.execute(op, data)
+        self.commit()
 
 
 if __name__ == '__main__':
     # print(check_location("Iowa City").json)
     with Connection() as conn:
-        print(conn.select_disaster(2))
-        conn.end_disaster(2)
-        print(conn.select_disaster(2))
+        print(conn.search_goods("App"))

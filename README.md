@@ -6,7 +6,7 @@
 *   User Profile - Amy
 *   User profile (other users) - JJ
 *   Search details page (Requests/Offers) - JJ
-*   Disaster details page - JJ
+*   Disaster details page - Sean
 *   General dashboard - Gaurav
 *   Search page - Gaurav
 *   Admin Page - Sean
