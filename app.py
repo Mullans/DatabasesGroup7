@@ -97,7 +97,6 @@ def create_request():
         abort(404)
 
 
-'''
 """JJ's Section START"""
 import mysql.connector as mysql
 
@@ -132,7 +131,7 @@ def user_search():
     return cursor.fetchall()
 
 """JJ's Section END"""
-'''
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
