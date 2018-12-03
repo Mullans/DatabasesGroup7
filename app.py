@@ -150,7 +150,7 @@ def email_confirm(UserId):
     
     requests.post(
             "https://api.mailgun.net/v3/sandbox93a72ba2ea354d68a0ee1eda24aab168.mailgun.org/messages",
-        auth=("api", "4535b9267b2fd60b10bffe2cd06a2798-52cbfb43-676a91bd"),
+        auth=("api", ""),
         data={"from": "Mailgun Sandbox <postmaster@sandbox93a72ba2ea354d68a0ee1eda24aab168.mailgun.org>",
               "to":  email,
               "subject": "Hello  "+ name,
