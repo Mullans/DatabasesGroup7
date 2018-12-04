@@ -3,20 +3,22 @@ import json
 from datetime import datetime
 from passlib.hash import sha256_crypt
 # from flask_login import current_user, login_user, logout_user
-from flaskext.mysql import MySQL
+# from flaskext.mysql import MySQL
 from wtforms import Form, StringField, PasswordField, validators
 
 from Connection import Connection
 
 app = Flask(__name__)
-mysql = MySQL()
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'password'  # '961216'
-app.config['MYSQL_DATABASE_DB'] = 'databases7'  # 'myapp'
-app.config['MYSQL_DATABASE_HOST'] = '127.0.0.1'  # 'db4free.net'
+# mysql = MySQL()
+
+config = {
+    "user": "root",
+    "password": "password",  # '961216'
+    "host": "localhost",  # 'db4free.net'
+    "database": "databases7"  # 'myapp'
+}
 app.secret_key = '123'
-mysql.init_app(app)
-conn = Connection(mysql.connect())
+conn = Connection(config=config)
 
 
 @app.route('/')
@@ -38,6 +40,7 @@ def disasters():
 @app.route('/disaster/<disasterID>')
 def disaster_item(disasterID):
     disaster = conn.select_disaster(disasterID)
+    print(disaster)
     if len(disaster) == 0:
         abort(404)
     disaster = list(disaster[0])
@@ -146,16 +149,18 @@ def user_search():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-
         password_candidate = request.form['password_']  # password
         cursor = conn.cursor
-        name = cursor.execute("select * from Users where username= %s", request.form['username'])
+        x = request.form['username']
+        cursor.execute("SELECT * FROM Users WHERE username=%s", [x])
+        data = conn.fetch()
         app.secret_key = '123'
         session['username'] = request.form['username']
-        if name > 0:
-            data = cursor.fetchone()  # fetchall
+        if len(data) > 0:
+            data = data[0]  # fetchall
 
-            password_ = data[4]  # tuple
+            password_ = data[3]  # tuple
+            print(password_)
             if sha256_crypt.verify(password_candidate, password_):
                 flash('You have successfully logged in!', 'success')
                 return render_template('login.html')  # ,UserID=username) #return redirect(url_for('profile'),username))
@@ -231,7 +236,6 @@ def register():
         """
         # data = cursor.fetchone()
         conn.commit()
-        cursor.close()
         flash('Registration successful! Please check your email.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)

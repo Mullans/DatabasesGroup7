@@ -1,4 +1,4 @@
-# import mysql.connector as mysql
+import mysql.connector as mysql
 from geopy.geocoders import Nominatim
 from datetime import datetime
 """
@@ -11,15 +11,16 @@ https://dev.mysql.com/doc/connector-python/en/connector-python-api-mysqlcursor.h
 
 class Connection:
 
-    def __init__(self, conn):
-        # _config = {
-        #     "user": "root",
-        #     "password": "password",
-        #     "host": "localhost",
-        #     "database": "databases7"
-        # }
-        # self.conn = mysql.connect(**_config)
-        self.conn = conn
+    def __init__(self, config=None):
+        if config is None:
+            config = {
+                "user": "root",
+                "password": "password",
+                "host": "localhost",
+                "database": "databases7"
+            }
+        self.conn = mysql.connect(**config)
+        # self.conn = conn
         self.cursor = self.conn.cursor()
         self.geolocator = None
         self.user = 'Stan'
