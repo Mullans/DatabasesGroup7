@@ -21,9 +21,9 @@ app.secret_key = '123'
 conn = Connection(config=config)
 
 
-@app.route('/')
-def index():
-    return ""
+# @app.route('/')
+# def index():
+#     return ""
 
 
 '''Sean's Section START'''
@@ -175,7 +175,7 @@ def email_confirm(UserId):
 
 """Gaurav's Section START"""
 
-@app.route("/Dashboard")
+@app.route("/")
 def dashboard_page():
     return render_template('dashboard.html', posts=dashboard_output(), posts2 = dashboard_output2(), posts3 = dashboard_output3())
 
