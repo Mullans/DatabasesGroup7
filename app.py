@@ -132,6 +132,27 @@ def user_search():
 
 """JJ's Section END"""
 
+"""Gaurav's Section START"""
+
+@app.route("/Dashboard")
+def dashboard_page():
+    return render_template('dashboard.html', posts=dashboard_output(), posts2 = dashboard_output2(), posts3 = dashboard_output3())
+
+def dashboard_output():
+    conn.execute("SELECT r.RequestID, g.Name, g.Category, g.UnitOfMeasure, r.DatePosted, r.Duration, r.QuantityNeeded, r.QuantityReceived FROM Requests r , PossibleGoods g WHERE r.GoodsID = g.GoodsID ")
+    data = conn.fetch()
+    return data
+def dashboard_output2():
+    conn.execute("SELECT o.OfferID, g.Name, g.Category, g.UnitOfMeasure, o.DatePosted, o.Duration, o.QuantityOffered, o.QuantityClaimed FROM Offers o , PossibleGoods g WHERE o.GoodsID = g.GoodsID ")
+    data2 = conn.fetch()
+    return data2
+def dashboard_output3():
+    conn.execute("SELECT RequestID, PeopleNeeded, PeopleFound, WorkCategory FROM VolunteerRequests")
+    data3 = conn.fetch()
+    return data3
+
+"""Gaurav's Section END"""
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
