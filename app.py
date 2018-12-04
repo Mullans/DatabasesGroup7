@@ -140,6 +140,27 @@ def user_search():
     return conn.fetch()
 
 
+
+@app.route("/Email_Confirm/<username>")
+def email_confirm(UserId):
+    conn.execute("SELECT email FROM User WHERE username = " + UserId)
+    email = conn.fetch()
+    conn.execute("SELECT first_name FROM User WHERE username = " + UserId)
+    first_name = conn.fetch()
+    conn.execute("SELECT last_name FROM User WHERE username = " + UserId)
+    last_name = conn.fetch()
+    name = first_name +" " + last_name
+    
+    requests.post(
+            "https://api.mailgun.net/v3/sandbox93a72ba2ea354d68a0ee1eda24aab168.mailgun.org/messages",
+        auth=("api", "api code goes here"),
+        data={"from": "Mailgun Sandbox <postmaster@sandbox93a72ba2ea354d68a0ee1eda24aab168.mailgun.org>",
+              "to":  email,
+              "subject": "Hello  "+ name,
+              "text": "Congratulations "+ first_name + ", you just confirmed your email!"})
+    
+    return redirect(url_for('email'))
+
 """JJ's Section END"""
 
 
