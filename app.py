@@ -104,12 +104,23 @@ def search_goods(searchTerm):
     return json.dumps(response)
 
 
-@app.route('/createRequest', methods=['POST'])
-def create_request():
+@app.route('/createRequest/<disasterID>', methods=['POST'])
+def create_request(disasterID):
     if request.method == 'POST':
         result = request.form
-        print(result)
-        return "It works?"
+        items = []
+        # for x in result.items():
+        #     print(x)
+        result_dict = json.loads(next(result.items())[0])
+        # print(result_dict)
+        for item in result_dict.items():
+            items.append([item[1][0][0], item[1][1], item[1][2]])
+        # print(items)
+        try:
+            conn.insert_requests(conn.user, disasterID, items)
+            return json.dumps({"result": True})
+        except:
+            return json.dumps({"result": False})
     else:
         abort(404)
 

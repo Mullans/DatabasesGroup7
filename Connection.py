@@ -23,7 +23,7 @@ class Connection:
         # self.conn = conn
         self.cursor = self.conn.cursor()
         self.geolocator = None
-        self.user = 'Stan'
+        self.user = 'stanp'
         self.isVolunteer = True
         self.isAdmin = True
 
@@ -116,11 +116,22 @@ class Connection:
         self.commit()
 
     # Requests Methods
-    def insert_request(self, user, disaster, good, duration, quantity):
-        date = datetime.new().date()
-        op = ("INSERT INTO Requests (UserID, DisasterID, GoodsID, DatePosted, Duration, QuantityNeeded, QuantityReceived) VALUES (%s %s %s %s %s %s %s)")
+    def insert_request(self, user, disaster, good, quantity, duration):
+        date = datetime.now().date()
+        op = ("INSERT INTO Requests (UserID, DisasterID, GoodsID, DatePosted, Duration, QuantityNeeded, QuantityReceived) VALUES (%s, %s, %s, %s, %s, %s, %s)")
         data = (user, disaster, good, date, duration, quantity, 0)
         self.execute(op, data)
+        self.commit()
+
+    def insert_requests(self, user, disaster, goods_list):
+        '''each item in goods list must be (goodID, quantity, duration)'''
+        date = datetime.now().date()
+        op = ("INSERT INTO Requests (UserID, DisasterID, GoodsID, DatePosted, Duration, QuantityNeeded, QuantityReceived) VALUES (%s, %s, %s, %s, %s, %s, %s)")
+        data = []
+        for item in goods_list:
+            data.append([user, disaster, item[0], date, item[2], item[1], '0'])
+        print(data)
+        self.executemany(op, data)
         self.commit()
 
 
