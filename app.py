@@ -150,13 +150,13 @@ def email_confirm(UserId):
     
     requests.post(
             "https://api.mailgun.net/v3/sandbox93a72ba2ea354d68a0ee1eda24aab168.mailgun.org/messages",
-        auth=("api", ""),
+        auth=("api", "api code goes here"),
         data={"from": "Mailgun Sandbox <postmaster@sandbox93a72ba2ea354d68a0ee1eda24aab168.mailgun.org>",
               "to":  email,
               "subject": "Hello  "+ name,
               "text": "Congratulations "+ first_name + ", you just confirmed your email!"})
     
-    return redirect("/") 
+    return redirect(url_for('email'))
 
 """JJ's Section END"""
 
