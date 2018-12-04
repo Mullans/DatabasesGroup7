@@ -198,21 +198,21 @@ def dashboard_output3():
 '''Amy's section START'''
 
 
+
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+
         password_candidate = request.form['password_']  # password
         cursor = conn.cursor
-        x = request.form['username']
-        cursor.execute("SELECT * FROM Users WHERE username=%s", [x])
-        data = conn.fetch()
+        name = cursor.execute("select * from Users where username= %s", request.form['username'])
         app.secret_key = '123'
         session['username'] = request.form['username']
-        if len(data) > 0:
-            data = data[0]  # fetchall
+        if name > 0:
+            data = cursor.fetchone()  # fetchall
 
             password_ = data[3]  # tuple
-            print(password_)
             if sha256_crypt.verify(password_candidate, password_):
                 flash('You have successfully logged in!', 'success')
                 return render_template('login.html')  # ,UserID=username) #return redirect(url_for('profile'),username))
@@ -223,22 +223,54 @@ def login():
             flash("Error: Username does not exist! Please try again!", 'error')
     return render_template('login.html')
 
+@app.route('/profile/<string:username>/') 
+def Create_profile(username):
+    con=mysql.connect()  
+    cursor=con.cursor()
+    result=cursor.execute("select* from Users where username= %s", [username])
+    user=cursor.fetchone()
+    return render_template('profile.html',user=user)
 
-@app.route('/profile/<string:username>/')
-def profile(username):
-    # con=mysql.connect()
-    cursor = conn.cursor
-    cursor.execute("select * from Users where username=%s", [username])
-    user = cursor.fetchone()
-    return render_template('profile2.html', user=user)
 
-
-@app.route('/profile/<string:username>/edit')
+@app.route('/profile/<string:username>/edit',methods=['GET','POST'])
 def edit_Profile(username):
-    cursor = conn.cursor
-    cursor.execute("select* from Users where username=%s", [username])
-    user = cursor.fetchone()
-    return render_template('edit.html', user=user)
+    con=mysql.connect()  
+    cursor=con.cursor()
+    data=cursor.execute("select* from Users where username= %s", [username])
+    user2=cursor.fetchone()
+    cursor.close()
+    form=UserRegister(request.form)
+    #change user infor
+    form.first_name.data=user2[1]
+    form.last_name.data=user2[2]
+    form.email.data=user2[4]
+    form.address.data=user2[5]
+    form.username.data=user2[0]
+    form.phone.data=user2[6]
+   
+    if request.method=='POST':
+          first_name=request.form['first_name']
+          last_name=request.form['last_name']
+          email=request.form['email']
+          address=request.form['address']
+          username1=request.form['username']
+          phone=request.form['phone']
+          
+          con=mysql.connect()  
+          cursor=con.cursor()
+          query="update user set first_name=%s, last_name=%s, email=%s, address=%s, username=%s, phone=%s where username=%s"
+          u=(first_name,last_name,email,address,username1,phone,username) 
+          cursor.execute("update Users set first_name=%s, last_name=%s, email=%s, address=%s, username=%s, phone=%s where username=%s",(first_name,last_name,email,address,username1,phone,username))
+          con.commit()
+          d2=cursor.fetchone()
+          cursor.close()
+          flash('User information updated!','success')
+          return render_template('edit.html',form=form)
+          #return redirect(url_for('edit'))
+
+    return render_template('edit.html',form=form)
+
+
 
 
 class UserRegister(Form):
@@ -256,6 +288,7 @@ class UserRegister(Form):
 def register():
     form = UserRegister(request.form)
     if request.method == 'POST' and form.validate():
+
         u = {
             'first_name': form.first_name.data,
             'last_name': form.last_name.data,
@@ -268,7 +301,7 @@ def register():
         cursor = conn.cursor
         loc = conn.check_location(u['address'])
         u['lat'], u['long'] = loc.latitude, loc.longitude
-        print(u['lat'], u['long'])
+        #print(u['lat'], u['long'])
         query = "insert into Users (last_name, first_name, username, password_, email, address, phone, latitude, longitude) values(%(last_name)s, %(first_name)s, %(username)s, %(password_)s, %(email)s,%(address)s, %(phone)s, %(lat)s, %(long)s)"
 
         cursor.execute(query, u)
@@ -288,9 +321,11 @@ def register():
         """
         # data = cursor.fetchone()
         conn.commit()
+        #cursor.close()
         flash('Registration successful! Please check your email.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
 
 
 '''Amy's section END'''
