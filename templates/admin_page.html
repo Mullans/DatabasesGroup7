@@ -51,15 +51,15 @@
               <th></th>
             </tr></thead>
             <tbody>
-            {% for disasterID, Name, Location, Date, Active in disasters %}
+            {% for DisasterID, Name, Location, Date, Active in disasters %}
             <tr>
-              <th>{{disasterID}}</th>
+              <th>{{DisasterID}}</th>
               <td>{{Name}}</td>
               <td>{{Location}}</td>
               <td>{{Date}}</td>
               <td>{{'True' if Active else 'False'}}</td>
               <td>
-                <a href="/disaster/{{disasterID}}" class="btn btn-primary">Details</a>
+                <a href="/disaster/{{DisasterID}}" class="btn btn-primary">Details</a>
               </td>
             </tr>
             {% endfor %}
