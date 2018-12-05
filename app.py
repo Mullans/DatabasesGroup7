@@ -5,11 +5,14 @@ from passlib.hash import sha256_crypt
 # from flask_login import current_user, login_user, logout_user
 # from flaskext.mysql import MySQL
 from wtforms import Form, StringField, PasswordField, validators
+from flask_mail import Mail, Message#A
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired#A
 
 from Connection import Connection
 
 app = Flask(__name__)
 # mysql = MySQL()
+app.config.from_pyfile('config.cfg')#A
 
 config = {
     "user": "root",
@@ -24,7 +27,30 @@ conn = Connection(config=config)
 # @app.route('/')
 # def index():
 #     return ""
+#email confir
+mail = Mail(app)
+k = URLSafeTimedSerializer("123")
+@app.route('/email', methods=['GET', 'POST'])
+def email():
+    if request.method == 'GET':
+        
+        return render_template('email.html')
 
+    email = request.form['email']
+    token = k.dumps(email, salt='email-confirm')
+    notice = Message('Confirm Email', sender='yuaimeee@gmail.com', recipients=[email])
+    notice.body = 'Here is the link {}'.format(url_for('getconfirm', token=token, _external=True))
+    mail.send(notice)
+    flash('Confirmation email sent! Please check your email.','success')
+    return render_template('email.html')
+#email confir
+@app.route('/email/<token>')
+def getconfirm(token):
+    try:
+         email = k.loads(token, salt='email-confirm', max_age=3600)
+    except SignatureExpired:
+         return '<h3>The token does not work anymore</h3>'
+    return '<h3>The token works</h3>'
 
 '''Sean's Section START'''
 
@@ -322,8 +348,8 @@ def register():
         # data = cursor.fetchone()
         conn.commit()
         #cursor.close()
-        flash('Registration successful! Please check your email.', 'success')
-        return redirect(url_for('login'))
+        flash('Registration successful!', 'success')
+        return redirect(url_for('email'))
     return render_template('register.html', form=form)
 
 
