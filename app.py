@@ -16,9 +16,9 @@ app.config.from_pyfile('config.cfg')#A
 
 config = {
     "user": "root",
-    "password": "password",  # '961216'
+    "password": "Gsj123@#",  # '961216'
     "host": "localhost",  # 'db4free.net'
-    "database": "databases7"  # 'myapp'
+    "database": "project"  # 'myapp'
 }
 app.secret_key = '123'
 conn = Connection(config=config)
