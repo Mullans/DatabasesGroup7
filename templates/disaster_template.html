@@ -40,7 +40,7 @@
       <div class="card">
         <nav class="card-header navbar navbar-light bg-light justify-content-between">
           <h5 id="disasterName" class="navbar-brand">{{disaster[5]}} ({{"Active" if disaster[8]==1 else "Closed"}})</h5>
-          <button id="deactivateButton" type="button" class="btn btn-primary"  {{"hidden=true" if disaster[8]==0 else ""}}>Deactivate</button>
+          <button id="deactivateButton" type="button" class="btn btn-primary"  {{"hidden=true" if disaster[8]==0 or not admin else ""}}>Deactivate</button>
         </nav>
         <div class="card-body">
           <p class="card-text"><small class="text-muted">Description: </small></p>
@@ -55,6 +55,7 @@
           <p class="card-text"><small class="text-muted">Map:</small></p>
           <div id="map" style="height:300px;"></div>
           <p class="card-text"><small class="text-muted">lat:{{disaster[2]}} long:{{disaster[3]}}</small></p>
+          <a class="btn btn-success btn-lrg btn-block" href="/disaster/{{disaster[0]}}/newOffer">Offer Aid for This Disaster</a>
           <a class="btn btn-danger btn-lrg btn-block" href="/disaster/{{disaster[0]}}/newRequest">Request Aid for This Disaster</a>
         </div>
       </div>

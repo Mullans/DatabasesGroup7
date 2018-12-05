@@ -134,6 +134,16 @@ class Connection:
         self.executemany(op, data)
         self.commit()
 
+    # Offers Methods
+    def insert_offers(self, user, disaster, goods_list):
+        date = datetime.now().date()
+        op = ("INSERT INTO Offers (UserID, DisasterID, GoodsID, DatePosted, Duration, QuantityOffered, QuantityClaimed) VALUES (%s, %s, %s, %s, %s, %s, %s)")
+        data = []
+        for item in goods_list:
+            data.append([user, disaster, item[0], date, item[2], item[1], '0'])
+        self.executemany(op, data)
+        self.commit()
+
 
 if __name__ == '__main__':
     # print(check_location("Iowa City").json)

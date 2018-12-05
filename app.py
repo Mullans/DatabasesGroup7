@@ -5,14 +5,14 @@ from passlib.hash import sha256_crypt
 # from flask_login import current_user, login_user, logout_user
 # from flaskext.mysql import MySQL
 from wtforms import Form, StringField, PasswordField, validators
-from flask_mail import Mail, Message#A
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired#A
+from flask_mail import Mail, Message  # A
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired  # A
 
 from Connection import Connection
 
 app = Flask(__name__)
 # mysql = MySQL()
-app.config.from_pyfile('config.cfg')#A
+app.config.from_pyfile('config.cfg')  # A
 
 config = {
     "user": "root",
@@ -27,13 +27,13 @@ conn = Connection(config=config)
 # @app.route('/')
 # def index():
 #     return ""
-#email confir
+# email confir
 mail = Mail(app)
 k = URLSafeTimedSerializer("123")
 @app.route('/email', methods=['GET', 'POST'])
 def email():
     if request.method == 'GET':
-        
+
         return render_template('email.html')
 
     email = request.form['email']
@@ -52,15 +52,22 @@ def getconfirm(token):
          return '<h3>The token does not work anymore</h3>'
     return '<h3>The token works</h3>'
 
+
 '''Sean's Section START'''
 
 
 @app.route('/admin_page')
-def disasters():
-    if not conn.isAdmin:
-        abort(403)
+def admin_page():
+    if conn.isAdmin:
+        return redirect(url_for('disasters'))
     disasters = conn.short_disasters()
     return render_template('./admin_page.html', name='tester', today=datetime.now().date().strftime("%m/%d/%Y"), disasters=disasters)
+
+
+@app.route('/disasters')
+def disasters():
+    disasters = conn.short_disasters()
+    return render_template('./disasters.html', disasters=disasters)
 
 
 @app.route('/disaster/<disasterID>')
@@ -71,7 +78,7 @@ def disaster_item(disasterID):
         abort(404)
     disaster = list(disaster[0])
     disaster[7] = disaster[7].strftime('%b %d, %Y')
-    return render_template("disaster_template.html", disaster=disaster)
+    return render_template("disaster_template.html", disaster=disaster, admin=conn.isAdmin)
 
 
 # TODO: Change this from JSON to POST
@@ -79,8 +86,7 @@ def disaster_item(disasterID):
 def deactivate_disaster(disasterID):
     print("Deactivating {}".format(disasterID))
     try:
-        with Connection() as conn:
-            conn.end_disaster(disasterID)
+        conn.end_disaster(disasterID)
         return '{"message": "Success"}'
     except Exception as e:
         print(e)
@@ -123,6 +129,15 @@ def create_request_page(disasterID):
     return render_template("makeRequest.html", disaster=disaster)
 
 
+@app.route('/disaster/<disasterID>/newOffer')
+def create_offer_page(disasterID):
+    disaster = conn.select_disaster(disasterID)
+    if len(disaster) == 0:
+        abort(404)
+    disaster = list(disaster[0])
+    return render_template("makeOffer.html", disaster=disaster)
+
+
 @app.route('/searchGoods/<searchTerm>')
 def search_goods(searchTerm):
     goods = conn.search_goods(searchTerm)
@@ -135,17 +150,30 @@ def create_request(disasterID):
     if request.method == 'POST':
         result = request.form
         items = []
-        # for x in result.items():
-        #     print(x)
         result_dict = json.loads(next(result.items())[0])
-        # print(result_dict)
         for item in result_dict.items():
             items.append([item[1][0][0], item[1][1], item[1][2]])
-        # print(items)
         try:
             conn.insert_requests(conn.user, disasterID, items)
             return json.dumps({"result": True})
-        except:
+        except Exception as e:
+            return json.dumps({"result": False})
+    else:
+        abort(404)
+
+
+@app.route('/createOffer/<disasterID>', methods=['POST'])
+def create_offer(disasterID):
+    if request.method == 'POST':
+        result = request.form
+        items = []
+        result_dict = json.loads(next(result.items())[0])
+        for item in result_dict.items():
+            items.append([item[1][0][0], item[1][1], item[1][2]])
+        try:
+            conn.insert_offers(conn.user, disasterID, items)
+            return json.dumps({"result": True})
+        except Exception as e:
             return json.dumps({"result": False})
     else:
         abort(404)
@@ -249,9 +277,9 @@ def login():
             flash("Error: Username does not exist! Please try again!", 'error')
     return render_template('login.html')
 
-@app.route('/profile/<string:username>/') 
+@app.route('/profile/<string:username>/')
 def Create_profile(username):
-    con=mysql.connect()  
+    con=mysql.connect()
     cursor=con.cursor()
     result=cursor.execute("select* from Users where username= %s", [username])
     user=cursor.fetchone()
@@ -260,7 +288,7 @@ def Create_profile(username):
 
 @app.route('/profile/<string:username>/edit',methods=['GET','POST'])
 def edit_Profile(username):
-    con=mysql.connect()  
+    con=mysql.connect()
     cursor=con.cursor()
     data=cursor.execute("select* from Users where username= %s", [username])
     user2=cursor.fetchone()
@@ -273,7 +301,7 @@ def edit_Profile(username):
     form.address.data=user2[5]
     form.username.data=user2[0]
     form.phone.data=user2[6]
-   
+
     if request.method=='POST':
           first_name=request.form['first_name']
           last_name=request.form['last_name']
@@ -281,11 +309,11 @@ def edit_Profile(username):
           address=request.form['address']
           username1=request.form['username']
           phone=request.form['phone']
-          
-          con=mysql.connect()  
+
+          con=mysql.connect()
           cursor=con.cursor()
           query="update user set first_name=%s, last_name=%s, email=%s, address=%s, username=%s, phone=%s where username=%s"
-          u=(first_name,last_name,email,address,username1,phone,username) 
+          u=(first_name,last_name,email,address,username1,phone,username)
           cursor.execute("update Users set first_name=%s, last_name=%s, email=%s, address=%s, username=%s, phone=%s where username=%s",(first_name,last_name,email,address,username1,phone,username))
           con.commit()
           d2=cursor.fetchone()
