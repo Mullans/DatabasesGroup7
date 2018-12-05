@@ -1,16 +1,17 @@
 CREATE TABLE `Users` (
-  `UserID` varchar(20) NOT NULL,
-  `IsVolunteer` int(11) NOT NULL,
-  `IsAdmin` int(11) NOT NULL,
-  `password` varchar(20) NOT NULL,
-  `Address` varchar(45) NOT NULL,
-  `Latitude` decimal(7,4) NOT NULL,
-  `Longitude` decimal(7,4) NOT NULL,
-  `FirstName` varchar(45) NOT NULL,
-  `LastName` varchar(45) NOT NULL,
-  `PhoneNumber` varchar(15) NOT NULL,
-  `UserRating` decimal(3,0) DEFAULT NULL,
-  `email` varchar(45) NOT NULL,
-  `status` int(11) NOT NULL,
-  PRIMARY KEY (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+  `username` VARCHAR(30) NOT NULL,
+  `first_name` VARCHAR(45) NOT NULL,
+  `last_name` VARCHAR(45) NOT NULL,
+  `password_` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(45) NOT NULL,
+  `address` VARCHAR(225) NOT NULL,
+  `phone` VARCHAR(20) NOT NULL,
+  `registerdate` DATETIME NOT NULL DEFAULT current_timestamp(),
+  `isVolunteer` INT NOT NULL DEFAULT 0,
+  `isAdmin` INT NOT NULL DEFAULT 0,
+  `latitude` DECIMAL(7,4) NOT NULL,
+  `longitude` DECIMAL(7,4) NOT NULL,
+  `status` INT NOT NULL DEFAULT 0,
+  `userRating` DECIMAL(6,3) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`username`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

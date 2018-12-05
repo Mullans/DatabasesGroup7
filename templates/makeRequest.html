@@ -21,6 +21,7 @@
   </head>
   <body>
     <div class="container">
+      {% include 'bar2.html' %}
       <div class="card">
         <h5 class="card-header">Request Aid for <strong>{{disaster[5]}}</strong></h5>
         <div class="card-body">
@@ -61,7 +62,7 @@
               </td>
             </tbody>
           </table>
-          <button id="submitButton" class="btn btn-primary float-right">Submit Requests</button>
+          <button id="submitButton" class="btn btn-primary float-right" disabled>Submit Requests</button>
         </div>
     </div>
         <!-- Modal -->
@@ -119,6 +120,7 @@
         requestQuantity.val(1);
         requestDuration.val(365);
         $("#addButton").prop("disabled", true);
+        $("#submitButton").prop("disabled", false);
       });
       $("#searchButton").click(function(){
           $("#goodsModal").modal('show');
@@ -152,9 +154,15 @@
       });
       $("#submitButton").click(function(){
         //TODO Do something on success/fail
-        $.post("/createRequest", JSON.stringify(requests), function(response){
+        $.post("/createRequest/{{disaster[0]}}", JSON.stringify(requests), function(response){
           //something on success
-
+          console.log(response);
+          if(response.result){
+            alert("Success!");
+            window.location.href = "/";
+          }else{
+            alert("An error occurred while submitting. Please try again later.")
+          }
         }, 'json');
         return false;
       })

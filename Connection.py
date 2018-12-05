@@ -11,17 +11,19 @@ https://dev.mysql.com/doc/connector-python/en/connector-python-api-mysqlcursor.h
 
 class Connection:
 
-    def __init__(self):
-        _config = {
-            "user": "root",
-            "password": "password",
-            "host": "localhost",
-            "database": "databases7"
-        }
-        self.conn = mysql.connect(**_config)
+    def __init__(self, config=None):
+        if config is None:
+            config = {
+                "user": "root",
+                "password": "password",
+                "host": "localhost",
+                "database": "databases7"
+            }
+        self.conn = mysql.connect(**config)
+        # self.conn = conn
         self.cursor = self.conn.cursor()
         self.geolocator = None
-        self.user = 'Stan'
+        self.user = 'stanp'
         self.isVolunteer = True
         self.isAdmin = True
 
@@ -68,7 +70,7 @@ class Connection:
         self.execute("SHOW TABLES")
         return self.fetch()
 
-    def check_location(location):
+    def check_location(self, location):
         geolocator = Nominatim(user_agent="DatabaseProject7")
         loc = geolocator.geocode(location)
         return loc
@@ -114,11 +116,22 @@ class Connection:
         self.commit()
 
     # Requests Methods
-    def insert_request(self, user, disaster, good, duration, quantity):
-        date = datetime.new().date()
-        op = ("INSERT INTO Requests (UserID, DisasterID, GoodsID, DatePosted, Duration, QuantityNeeded, QuantityReceived) VALUES (%s %s %s %s %s %s %s)")
+    def insert_request(self, user, disaster, good, quantity, duration):
+        date = datetime.now().date()
+        op = ("INSERT INTO Requests (UserID, DisasterID, GoodsID, DatePosted, Duration, QuantityNeeded, QuantityReceived) VALUES (%s, %s, %s, %s, %s, %s, %s)")
         data = (user, disaster, good, date, duration, quantity, 0)
         self.execute(op, data)
+        self.commit()
+
+    def insert_requests(self, user, disaster, goods_list):
+        '''each item in goods list must be (goodID, quantity, duration)'''
+        date = datetime.now().date()
+        op = ("INSERT INTO Requests (UserID, DisasterID, GoodsID, DatePosted, Duration, QuantityNeeded, QuantityReceived) VALUES (%s, %s, %s, %s, %s, %s, %s)")
+        data = []
+        for item in goods_list:
+            data.append([user, disaster, item[0], date, item[2], item[1], '0'])
+        print(data)
+        self.executemany(op, data)
         self.commit()
 
 
