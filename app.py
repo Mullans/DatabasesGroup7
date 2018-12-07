@@ -59,7 +59,7 @@ def getconfirm(token):
 
 @app.route('/admin_page')
 def admin_page():
-    if conn.isAdmin:
+    if not conn.isAdmin:
         return redirect(url_for('disasters'))
     disasters = conn.short_disasters()
     return render_template('./admin_page.html', name='tester', today=datetime.now().date().strftime("%m/%d/%Y"), disasters=disasters)
@@ -142,7 +142,7 @@ def create_offer_page(disasterID):
 @app.route('/disaster/<disasterID>/volunteer')
 def volunteer_page(disasterID):
     disaster = conn.select_disaster(disasterID)
-    
+
     if len(disaster) == 0:
         abort(404)
     disaster = list(disaster[0])
