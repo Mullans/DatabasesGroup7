@@ -43,20 +43,32 @@
           <button id="deactivateButton" type="button" class="btn btn-primary"  {{"hidden=true" if disaster[8]==0 or not admin else ""}}>Deactivate</button>
         </nav>
         <div class="card-body">
-          <p class="card-text"><small class="text-muted">Description: </small></p>
+          <p class="card-text" style="margin-bottom:0"><small class="text-muted">Description: </small></p>
           <p class="card-text">{{disaster[6]}}</p>
-          <p class="card-text"><small class="text-muted">Details: </small></p>
+          <p class="card-text" style="margin-bottom:0"><small class="text-muted">Details: </small></p>
           <ul class="list-group list-group-flush">
             <li class="list-group-item">Disaster ID: {{"{:05d}".format(disaster[0])}}</li>
             <li class="list-group-item">Location: {{disaster[1]}}</li>
             <li class="list-group-item">Starting Date: {{disaster[7]}}</li>
             <li class="list-group-item">Disaster Radius: {{disaster[4]}} miles</li>
           </ul>
-          <p class="card-text"><small class="text-muted">Map:</small></p>
+          <p class="card-text" style="margin-bottom:0"><small class="text-muted">Map:</small></p>
           <div id="map" style="height:300px;"></div>
-          <p class="card-text"><small class="text-muted">lat:{{disaster[2]}} long:{{disaster[3]}}</small></p>
-          <a class="btn btn-success btn-lrg btn-block" href="/disaster/{{disaster[0]}}/newOffer">Offer Aid for This Disaster</a>
-          <a class="btn btn-danger btn-lrg btn-block" href="/disaster/{{disaster[0]}}/newRequest">Request Aid for This Disaster</a>
+          <p class="card-text" style="margin-bottom:0"><small class="text-muted">lat:{{disaster[2]}} long:{{disaster[3]}}</small></p>
+          <div class="row">
+            <div class="col-lg-6">
+              <a class="btn btn-success btn-block" href="/disaster/{{disaster[0]}}/volunteer">Volunteer for This Disaster</a>
+            </div>
+            <div class="col-lg-6">
+              <a class="btn btn-success btn-block" href="/disaster/{{disaster[0]}}/newOffer">Offer Aid for This Disaster</a>
+            </div>
+          </div>
+          <div class="row" style="margin-top:5px">
+            <div class="col-lg-12">
+              <a class="btn btn-danger btn-lrg btn-block" href="/disaster/{{disaster[0]}}/newRequest">Request Aid for This Disaster</a>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

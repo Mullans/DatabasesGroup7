@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <!-- Stylesheet - uses path defined by flask -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}" />
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <title>Volunteer Toggle</title>
+  </head>
+  <body>
+    <div class="container">
+      {% include 'bar2.html' %}
+      <div class="card">
+        <h5 class="card-header">Request Aid for <strong>{{disaster[5]}}</strong></h5>
+        <div class="card-body">
+          <table class="table">
+            <thead><tr>
+              <th>Requested Item</th>
+              <th>Quantity</th>
+              <th>Request Duration</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="tableBody">
+              <td>
+                <div class="input-group">
+                  <input type="text"class="form-control" id="newRequestItem" placeholder="Search to Add Item" readonly>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-primary" id="searchButton" type="button">Search</button>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="input-group">
+                  <input type="number" class="form-control text-right" id="newRequestQuantity" value="1" min="0" disabled>
+                  <div class="input-group-append">
+                    <div id="requestUnits" class="input-group-text">count</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="input-group">
+                  <input type="number" class="form-control text-right" id="newRequestDuration" value="365" min="0" disabled>
+                  <div class="input-group-append">
+                    <div class="input-group-text">days</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <button id="addButton" class="btn btn-success" disabled>Add</button>
+              </td>
+            </tbody>
+          </table>
+          <button id="submitButton" class="btn btn-primary float-right" disabled>Submit Requests</button>
+        </div>
+    </div>
+        <!-- Modal -->
+    <div class="modal fade" id="goodsModal" tabindex="-1" role="dialog" aria-labelledby="goodsModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="goodsModalLabel">Select Good</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="input-group">
+              <input type="text"class="form-control" id="modalSearchInput" placeholder="Enter Item Name">
+              <div class="input-group-append">
+                <button class="btn btn-outline-primary" id="modalSearch" type="button">Search</button>
+              </div>
+            </div>
+            <table class="table table-bordered" style="margin-top:10px;">
+              <thead></thead>
+              <tbody id="modalTableBody">
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    $(document).ready(function(){
+      var requests = new Object();
+      var goodsOptions = [];
+      var requestTable = $("#tableBody");
+      var requestItemInput = $("#newRequestItem");
+      var requestQuantity = $("#newRequestQuantity");
+      var requestDuration = $("#newRequestDuration");
+      var nextName = 0;
+      var selected = null;
+      $("#addButton").click(function(){
+        var quantity = requestQuantity.val()
+        requests[nextName] = [selected, requestQuantity.val(), requestDuration.val()]
+        console.log(requests);
+        requestTable.prepend("<tr name='"+nextName+"'><td>"+selected[2]+"</td><td>"+requestQuantity.val()+"</td><td>"+requestDuration.val()+"</td><td><button class='btn btn-danger' value='"+nextName+"'>Remove</button></td></tr>");
+        $("button[value="+nextName+"]").click(function(){
+          delete requests[$(this).val()];
+          $(this).parents("tr").remove();
+        });
+        nextName += 1;
+        selected = null;
+        requestItemInput.val('');
+        requestQuantity.val(1);
+        requestDuration.val(365);
+        $("#addButton").prop("disabled", true);
+        $("#submitButton").prop("disabled", false);
+      });
+      $("#searchButton").click(function(){
+          $("#goodsModal").modal('show');
+          $("#modalSearch").click(function(){
+            $.getJSON('/searchGoods/'+$("#modalSearchInput").val(), function(data){
+              goodsOptions = data.result;
+              var modalTable = $("#modalTableBody");
+              modalTable.empty();
+              for(var i = 0; i< data.result.length; i++){
+                item = data.result[i]
+                modalTable.append("<tr><td class='h6' style='width:80%; vertical-align:inherit'>"+item[2]+"</td><td><button value='"+i+"' class='table-button btn btn-success h6'>Select</button></td></tr>");
+                $("button.table-button[value='"+i+"']").click(function(){
+                  selected = goodsOptions[$(this).val()];
+                  requestItemInput.val(selected[2]);
+                  $("#requestUnits").text(selected[3]);
+                  requestQuantity.prop("disabled", false);
+                  requestDuration.prop("disabled", false);
+                  $("#addButton").prop("disabled", false);
+                  $("#goodsModal").modal('hide');
+                })
+              }
+            });
+          });
+      });
+      requestQuantity.on('input', function(){
+        if($(this).val() == 0){
+          $('#addButton').prop("disabled", true);
+        }else{
+          $('#addButton').prop("disabled", false);
+        }
+      });
+      $("#submitButton").click(function(){
+        //TODO Do something on success/fail
+        $.post("/createRequest/{{disaster[0]}}", JSON.stringify(requests), function(response){
+          //something on success
+          console.log(response);
+          if(response.result){
+            alert("Success!");
+            window.location.href = "/";
+          }else{
+            alert("An error occurred while submitting. Please try again later.")
+          }
+        }, 'json');
+        return false;
+      })
+    });
+  </script>
+</html>

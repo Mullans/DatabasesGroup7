@@ -20,6 +20,7 @@ config = {
     "host": "localhost",  # 'db4free.net'
     "database": "project"  # 'myapp'
 }
+config=None
 app.secret_key = '123'
 conn = Connection(config=config)
 
@@ -136,6 +137,16 @@ def create_offer_page(disasterID):
         abort(404)
     disaster = list(disaster[0])
     return render_template("makeOffer.html", disaster=disaster)
+
+
+@app.route('/disaster/<disasterID>/volunteer')
+def volunteer_page(disasterID):
+    disaster = conn.select_disaster(disasterID)
+    
+    if len(disaster) == 0:
+        abort(404)
+    disaster = list(disaster[0])
+    return render_template("newVolunteer.html", disaster=disaster)
 
 
 @app.route('/searchGoods/<searchTerm>')
